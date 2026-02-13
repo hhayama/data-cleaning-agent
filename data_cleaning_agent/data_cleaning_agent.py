@@ -217,8 +217,8 @@ def make_lightweight_data_cleaning_agent(
             2. Remove duplicate rows
             3. Identify the categorical columns in order of cardinality.  These may be used for data imputation and sorting.  
                If there is only one categorical column, then do not use categorical data for imputation. 
-            5. Exclude numeric columns related to coordinates (There may be various names like latitude, longitude, lat, lon, etc.) from Outlier detection and imputation. 
-            4. In numeric columns, identify any outlier values using the IQR method and replace them with the p99 value if high and p1 value if low.
+            4. Exclude numeric columns related to coordinates (There may be various names like latitude, longitude, lat, lon, etc.) from Outlier detection and imputation. 
+            5. In numeric columns, identify any outlier values using the IQR method and replace them with the p99 value if high and p1 value if low.
                For other numeric columns, impute missing values with the mean of the categorical column with the lowest cardinality and round the output to two decimal places.
             6. Impute missing categorical values by grouping by the lowest cardinality column and then using the mode of the group.  
                If the lowest cardinality column is the column being imputed, then use the mode of the entire dataset.
