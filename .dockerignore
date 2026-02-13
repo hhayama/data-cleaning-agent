@@ -1,0 +1,26 @@
+# Environment 
+# .env
+# .env.*
+!.env.example
+.venv
+venv
+env
+
+
+# Git and IDE
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+
+# Logs and local outputs
+logs/
+data/
+outputs/
+
+# OS
+.DS_Store
+Thumbs.db

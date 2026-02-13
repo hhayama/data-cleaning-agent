@@ -89,7 +89,9 @@ poetry run streamlit run app.py
 Then:
 1. Upload your CSV file
 2. Click "Clean Data"
-3. Download the cleaned dataset
+3. (Optional) Add custom cleaning instructions.  You can add them in addition to the base instructions but you must be explicit in the order of operations. 
+4. A debug option is available as well to look at the the generated code and the prompt that was used to generate the output.
+5. Download the cleaned dataset
 
 ### Python API
 
