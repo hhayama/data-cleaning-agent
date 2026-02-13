@@ -2,7 +2,7 @@
 name = "data-cleaning-agent"
 version = "0.1.0"
 description = "A lightweight data cleaning agent using LangChain and LangGraph"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Hiroki Hayama <hhayama@gmail.com>"]
 readme = "README.md"
 packages = [{include = "data_cleaning_agent"}]
 

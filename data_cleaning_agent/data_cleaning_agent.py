@@ -130,6 +130,12 @@ class LightweightDataCleaningAgent:
         if self.response:
             return self.response.get("data_cleaner_function")
 
+    def get_data_cleaner_prompt_message(self):
+        """
+        Retrieves the agent's prompt message.
+        """
+        if self.response:
+            return self.response.get("data_cleaner_prompt_message")
 
 # Agent Factory Function
 
@@ -182,6 +188,7 @@ def make_lightweight_data_cleaning_agent(
         data_cleaner_function: str
         data_cleaner_function_path: str
         data_cleaner_function_name: str
+        data_cleaner_prompt_message: str
         data_cleaner_error: str
         max_retries: int
         retry_count: int
@@ -200,18 +207,26 @@ def make_lightweight_data_cleaning_agent(
         
         # TODO: Expand this prompt with more detailed cleaning instructions
         data_cleaning_prompt = PromptTemplate(
-            template="""
-            You are a Data Cleaning Agent. Create a {function_name}() function to clean the data.
 
-            Basic Cleaning Steps to implement:
+            template="""
+            You are a Data Cleaning Agent and have extensive experience in data cleaning and data science. 
+            Create a {function_name}() function to clean the data.
+
+            Basic Cleaning Steps to implement in order:
             1. Remove columns with more than 40% missing values
-            2. Impute missing values (mean for numeric, mode for categorical)
-            3. Remove duplicate rows
+            2. Remove duplicate rows
+            3. Identify the categorical columns in order of cardinality.  These may be used for data imputation and sorting.  
+               If there is only one categorical column, then do not use categorical data for imputation. 
+            5. Exclude numeric columns related to coordinates (There may be various names like latitude, longitude, lat, lon, etc.) from Outlier detection and imputation. 
+            4. In numeric columns, identify any outlier values using the IQR method and replace them with the p99 value if high and p1 value if low.
+               For other numeric columns, impute missing values with the mean of the categorical column with the lowest cardinality and round the output to two decimal places.
+            6. Impute missing categorical values by grouping by the lowest cardinality column and then using the mode of the group.  
+               If the lowest cardinality column is the column being imputed, then use the mode of the entire dataset.
+            7. Finally, jointly sort the data in ascending order by the lowest cardinality column and then the highest cardinality column. Do not combine the columns into a single column.
 
             User Instructions:
             {user_instructions}
 
-            Dataset Summary:
             {all_datasets_summary}
 
             Return Python code in ```python``` format with a single function:
@@ -222,7 +237,10 @@ def make_lightweight_data_cleaning_agent(
                 # Your cleaning code here
                 return data_cleaned
 
-            Important: Ensure fit_transform() outputs are flattened with .ravel() when assigning to DataFrame columns.
+            Important: 
+            Ensure fit_transform() outputs are flattened with .ravel() when assigning to DataFrame columns. 
+            Also make sure to work with a copy of the DataFrame when manipulating slices of data.
+            
             """,
             input_variables=["user_instructions", "all_datasets_summary", "function_name"]
         )
@@ -234,7 +252,7 @@ def make_lightweight_data_cleaning_agent(
             "all_datasets_summary": dataset_summary,
             "function_name": function_name
         })
-        
+                
         # Simple logging if enabled
         file_path = None
         if log:
@@ -242,11 +260,18 @@ def make_lightweight_data_cleaning_agent(
             with open(file_path, 'w') as f:
                 f.write(response)
             logger.info(f"Code saved to: {file_path}")
-   
+        # data_cleaner_prompt_message = data_cleaning_prompt.template
+        data_cleaner_prompt_message = data_cleaning_prompt.format(
+            user_instructions=state.get("user_instructions") or "Follow the basic cleaning steps.",
+            all_datasets_summary=dataset_summary,
+            function_name=function_name
+        )
+
         return {
             "data_cleaner_function": response,
             "data_cleaner_function_path": file_path,
             "data_cleaner_function_name": function_name,
+            "data_cleaner_prompt_message": data_cleaner_prompt_message,
         }
         
     def execute_data_cleaner_code(state):
