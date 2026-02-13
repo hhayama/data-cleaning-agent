@@ -10,10 +10,10 @@ docker:
 	@echo "Building data cleaning agent dashboard docker image"
 	@docker build -t data-cleaning-agent .
 	@echo " Stopping data cleaning agent dashboard docker container"
-	-@docker stop data-cleaning-agent-d && docker rm data-cleaning-agent-d
+	-@docker stop data-cleaning-agent && docker rm data-cleaning-agent
 	@echo "Starting data cleaning agent dashboard docker container"
-	@docker run --name data-cleaning-agent-d -d -p 8501:8501 data-cleaning-agent
+	@docker run --name data-cleaning-agent -d -p 8501:8501 data-cleaning-agent
 
 stop:
 	@echo " Stopping data cleaning agent dashboard docker container"
-	-@docker stop data-cleaning-agent-d && docker rm data-cleaning-agent-d
+	-@docker stop data-cleaning-agent && docker rm data-cleaning-agent
